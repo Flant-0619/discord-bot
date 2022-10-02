@@ -2,13 +2,12 @@ import {  VercelRequest, VercelResponse } from "@vercel/node";
 import { FailedRequest } from "./interface";
 
 export default function handler(event:  VercelRequest, response: VercelResponse) {
+  console.log(event.body);
   const validate = checkRequest(event)
   if(validate) {
     response.statusCode = validate.statusCode
     response.end();
   };
-
-  console.log(event.body);
 
 }
 
