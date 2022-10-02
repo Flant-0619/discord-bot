@@ -14,13 +14,14 @@ export default function handler(event:  VercelRequest, response: VercelResponse)
         message: 'invalid request signature'
       })
       response.end();
-    };
+    } else {
     console.log(200)
     response.statusCode = 200
     response.send({
       type: InteractionResponseType.Pong,
     });
     response.end();
+  }
   } catch(e) {
     console.error(e)
   }
