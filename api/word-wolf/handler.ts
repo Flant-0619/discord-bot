@@ -6,20 +6,23 @@ const nacl = require('tweetnacl');
 
 export default function handler(event:  VercelRequest, response: VercelResponse) {
   console.log(event);
-  const validate = checkRequest(event)
-  if(validate) {
-    response.statusCode = 401
+  try{
+    const validate = checkRequest(event)
+    if(validate) {
+      response.statusCode = 401
+      response.send({
+        message: 'invalid request signature'
+      })
+      response.end();
+    };
+    response.statusCode = 200
     response.send({
-      message: 'invalid request signature'
-    })
+      type: InteractionResponseType.Pong,
+    });
     response.end();
-  };
-  response.statusCode = 200
-  response.send({
-    type: InteractionResponseType.Pong,
-  });
-  response.end();
-
+  } catch(e) {
+    console.error(e)
+  }
 }
 
 function checkRequest(event: VercelRequest): Boolean {
@@ -27,6 +30,7 @@ function checkRequest(event: VercelRequest): Boolean {
   const strBody = event.body
 
   const PUBLIC_KEY = process.env.PUBLIC_KEY
+  console.log(PUBLIC_KEY)
 
   const signature = headers["x-signature-ed25519"].toString()
   const timestamp = headers["x-signature-timestamp"]
