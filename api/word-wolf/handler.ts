@@ -8,6 +8,8 @@ export default function handler(event:  VercelRequest, response: VercelResponse)
     response.statusCode = validate.statusCode
     response.end();
   };
+  response.statusCode = 200
+  response.end();
 
 }
 
