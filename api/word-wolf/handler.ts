@@ -3,12 +3,12 @@ import { InteractionResponseType } from "discord.js";
 import { FailedRequest } from "./interface";
 
 export default function handler(event:  VercelRequest, response: VercelResponse) {
-  console.log(event.body);
-  // const validate = checkRequest(event)
-  // if(validate) {
-  //   response.statusCode = validate.statusCode
-  //   response.end();
-  // };
+  console.log(event);
+  const validate = checkRequest(event)
+  if(validate) {
+    response.statusCode = validate.statusCode
+    response.end();
+  };
   response.statusCode = 200
   response.send({
     type: InteractionResponseType.Pong,
