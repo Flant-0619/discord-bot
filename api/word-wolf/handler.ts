@@ -1,4 +1,5 @@
 import {  VercelRequest, VercelResponse } from "@vercel/node";
+import { InteractionResponseType } from "discord.js";
 import { FailedRequest } from "./interface";
 
 export default function handler(event:  VercelRequest, response: VercelResponse) {
@@ -9,6 +10,9 @@ export default function handler(event:  VercelRequest, response: VercelResponse)
     response.end();
   };
   response.statusCode = 200
+  response.send({
+    type: InteractionResponseType.Pong,
+  });
   response.end();
 
 }
