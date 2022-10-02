@@ -31,6 +31,8 @@ function checkRequest(event: VercelRequest): Boolean {
   const headers = event.headers
   const strBody = event.body
 
+  const g = `${strBody}`
+  
   const PUBLIC_KEY = process.env.PUBLIC_KEY
 
   const signature = headers["x-signature-ed25519"].toString()
@@ -38,7 +40,7 @@ function checkRequest(event: VercelRequest): Boolean {
 
 
   const isVerified = nacl.sign.detached.verify(
-    Buffer.from(timestamp + strBody),
+    Buffer.from(timestamp + g),
     Buffer.from(signature, 'hex'),
     Buffer.from(PUBLIC_KEY, 'hex')
   );
