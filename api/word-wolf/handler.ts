@@ -1,8 +1,7 @@
 import {  VercelRequest, VercelResponse } from "@vercel/node";
 import { InteractionResponseType } from "discord.js";
+import nacl from "tweetnacl";
 import { FailedRequest } from "./interface";
-
-const nacl = require('tweetnacl');
 
 export default function handler(event:  VercelRequest, response: VercelResponse) {
   try{
@@ -44,8 +43,7 @@ function checkRequest(event: VercelRequest): Boolean {
     Buffer.from(PUBLIC_KEY, 'hex')
   );
 
-  
-  if(!isVerified) {
-    return false
-  }
+    console.log(isVerified)
+
+  return isVerified
 }
