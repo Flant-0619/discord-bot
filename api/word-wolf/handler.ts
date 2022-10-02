@@ -6,12 +6,13 @@ const nacl = require('tweetnacl');
 
 export default function handler(event:  VercelRequest, response: VercelResponse) {
   try{
+    console.log(event.body)
     const validate = checkRequest(event)
     if(!validate) {
       console.log(401)
-      response.statusCode = 401
       response.send({
-        message: 'invalid request signature'
+        statusCode: 401,
+        body: JSON.stringify('invalid request signature'),
       })
       response.end();
     } else {
