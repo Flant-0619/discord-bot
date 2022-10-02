@@ -2,11 +2,16 @@ import {  VercelRequest, VercelResponse } from "@vercel/node";
 import { InteractionResponseType } from "discord.js";
 import { FailedRequest } from "./interface";
 
+const nacl = require('tweetnacl');
+
 export default function handler(event:  VercelRequest, response: VercelResponse) {
   console.log(event);
   const validate = checkRequest(event)
   if(validate) {
-    response.statusCode = validate.statusCode
+    response.statusCode = 401
+    response.send({
+      message: 'invalid request signature'
+    })
     response.end();
   };
   response.statusCode = 200
@@ -17,20 +22,24 @@ export default function handler(event:  VercelRequest, response: VercelResponse)
 
 }
 
-function checkRequest(event: VercelRequest): FailedRequest {
+function checkRequest(event: VercelRequest): Boolean {
   const headers = event.headers
-  const body = event.body
+  const strBody = event.body
 
-  const signature = headers["x-signature-ed25519"]
+  const PUBLIC_KEY = process.env.PUBLIC_KEY
+
+  const signature = headers["x-signature-ed25519"].toString()
   const timestamp = headers["x-signature-timestamp"]
 
-  if(!signature || !timestamp || !body) {
-    return {
-      "cookies": [],
-      "isBase64Encoded": false,
-      "statusCode": 401,
-      "headers": {},
-      "body": ""
-  }
+
+  const isVerified = nacl.sign.detached.verify(
+    Buffer.from(timestamp + strBody),
+    Buffer.from(signature, 'hex'),
+    Buffer.from(PUBLIC_KEY, 'hex')
+  );
+
+  
+  if(!isVerified) {
+    return false
   }
 }
