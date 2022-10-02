@@ -6,7 +6,7 @@ const nacl = require('tweetnacl');
 
 export default function handler(event:  VercelRequest, response: VercelResponse) {
   try{
-    console.log(event.body)
+    console.log(event.headers)
     const validate = checkRequest(event)
     if(!validate) {
       console.log(401)
