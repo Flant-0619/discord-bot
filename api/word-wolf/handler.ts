@@ -4,6 +4,12 @@ import nacl from "tweetnacl";
 import { FailedRequest } from "./interface";
 import type { Readable } from 'node:stream';
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default async function handler(event:  VercelRequest, response: VercelResponse) {
   try{
     console.log(event.headers)
@@ -33,7 +39,7 @@ async function checkRequest(event: VercelRequest): Promise<Boolean> {
   const headers = event.headers
 
   const buf = await buffer(event);
-  const strBody = buf.toString();
+  const strBody = buf.toString('utf8');
   
   const signature = headers["x-signature-ed25519"]
   const timestamp = headers["x-signature-timestamp"]
