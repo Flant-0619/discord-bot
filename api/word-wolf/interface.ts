@@ -1,7 +1,5 @@
-export interface FailedRequest {
-  cookies: string[],
-  isBase64Encoded: boolean,
-  statusCode: number,
-  headers: {},
-  body: string
+export interface PostCommandData {
+  name: string,
+  type: number,
+  description: string,
 }

@@ -1,15 +1,18 @@
 import {  VercelRequest, VercelResponse } from "@vercel/node";
-import { bold, InteractionResponseType } from "discord.js";
+import { InteractionResponseType } from "discord.js";
 import nacl from "tweetnacl";
-import { FailedRequest } from "./interface";
 import type { Readable } from 'node:stream';
-import axios from "axios";
+import axios, { AxiosStatic } from "axios";
+import { WordWolfCommandService } from "./service";
+import { PostCommandData } from "./interface";
 
 export const config = {
   api: {
     bodyParser: false,
   },
 };
+
+const wordWolfCommandService = new WordWolfCommandService()
 
 export default async function handler(event:  VercelRequest, response: VercelResponse) {
   try{
@@ -38,6 +41,43 @@ export default async function handler(event:  VercelRequest, response: VercelRes
         }
       )
       response.end()
+    }
+
+    const fullCommand = String(event.body.data.name).split(":")
+    const command = fullCommand.shift()
+
+    switch(command) {
+      case 'game':
+        wordWolfCommandService.game(command, fullCommand);
+        break;
+
+      case 'round':
+        wordWolfCommandService.round(command, fullCommand);
+        break;
+
+      case 'set':
+        wordWolfCommandService.set(command, fullCommand);
+        break;
+
+      case 'player':
+        wordWolfCommandService.player(command, fullCommand);
+        break;
+
+      case 'vote':
+        wordWolfCommandService.word(command, fullCommand);
+        break;
+
+      case 'word':
+        wordWolfCommandService.word(command, fullCommand);
+        break;
+
+      case 'score':
+        wordWolfCommandService.score(command, fullCommand);
+        break;
+
+      case 'library':
+        wordWolfCommandService.library(command, fullCommand);
+        break;
     }
 
   } catch(e) {
@@ -108,13 +148,103 @@ async function registerCommands() {
     "Content-Type": "application/json"
   }
 
-  const command_data = {
-    "name": "foo",
-    "type": 1,
-    "description": "replies with bar ;/",
-  }
+  const commands: PostCommandData[] = [
+    {
+      "name": "game:start",
+      "type": 1,
+      "description": "game start command;/",
+    },
+    {
+      "name": "game:end",
+      "type": 1,
+      "description": "game end command;/",
+    },
+    {
+      "name": "round:start",
+      "type": 1,
+      "description": "round start command;/",
+    },
+    {
+      "name": "set:timer",
+      "type": 1,
+      "description": "timer set command;/",
+    },
+    {
+      "name": "set:round",
+      "type": 1,
+      "description": "round set command;/",
+    },
+    {
+      "name": "set:mode",
+      "type": 1,
+      "description": "mode set command;/",
+    },
+    {
+      "name": "player:add",
+      "type": 1,
+      "description": "player add command;/",
+    },
+    {
+      "name": "player:remove",
+      "type": 1,
+      "description": "player ramove command;/",
+    },
+    {
+      "name": "vote",
+      "type": 1,
+      "description": "vote command;/",
+    },
+    {
+      "name": "word:anser",
+      "type": 1,
+      "description": "anser declared command;/",
+    },
+    {
+      "name": "word:human",
+      "type": 1,
+      "description": "human word set command;/",
+    },
+    {
+      "name": "word:wolf",
+      "type": 1,
+      "description": "wolf word set command;/",
+    },
+    {
+      "name": "score",
+      "type": 1,
+      "description": "score display;/",
+    },
+    {
+      "name": "library:word:add",
+      "type": 1,
+      "description": "library add word;/",
+    },
+    {
+      "name": "library:word:remove",
+      "type": 1,
+      "description": "library remove word;/",
+    },
+    {
+      "name": "library:category:add",
+      "type": 1,
+      "description": "library add category;/",
+    },
+    {
+      "name": "library:category:remove",
+      "type": 1,
+      "description": "library remove category;/",
+    },
+  ]
 
-  await axios.post(url, JSON.stringify(command_data), {
-    headers: headers,
+  const work: Promise<AxiosStatic>[] = []
+
+  commands.forEach((command) => {
+    work.push(
+      axios.post(url, JSON.stringify(command), {
+      headers: headers,
+      })
+    )
   })
+
+  Promise.all(work)
 }
