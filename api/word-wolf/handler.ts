@@ -29,7 +29,7 @@ export default function handler(event:  VercelRequest, response: VercelResponse)
 
 function checkRequest(event: VercelRequest): Boolean {
   const headers = event.headers
-  const strBody =  JSON.stringify(event.body)
+  const strBody =  String(event.body)
   
   const signature = headers["x-signature-ed25519"]
   const timestamp = headers["x-signature-timestamp"]
