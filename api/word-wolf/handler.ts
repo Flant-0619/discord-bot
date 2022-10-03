@@ -40,6 +40,7 @@ async function checkRequest(event: VercelRequest): Promise<Boolean> {
 
   const buf = await buffer(event);
   const strBody = buf.toString('utf8');
+  console.log(strBody)
   
   const signature = headers["x-signature-ed25519"]
   const timestamp = headers["x-signature-timestamp"]
@@ -74,7 +75,7 @@ async function checkRequest(event: VercelRequest): Promise<Boolean> {
 }
 
 async function buffer(readable: Readable) {
-  const chunks: string[] = [];
+  const chunks: Uint8Array[] = [];
   for await (const chunk of readable) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
   }
