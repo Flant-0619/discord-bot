@@ -38,50 +38,42 @@ export default async function handler(event:  VercelRequest, response: VercelRes
     }
 
     console.log(event.body.data.name)
+    console.log(event.body.data.options)
 
-    if (event.body.data.name == 'foo') {
-      response.send({
-        type: 4,  // This type stands for answer with invocation shown
-        data: { "content": "bar" }
-        }
-      )
-      response.end()
-    }
+    const command = event.body.data.name
+    const options = event.body.data.options
 
-    const fullCommand = String(event.body.data.name).split(":")
-    const command = fullCommand.shift()
-
-    switch(command) {
+    switch(event.body.data.name) {
       case 'game':
-        wordWolfCommandService.game(command, fullCommand);
+        wordWolfCommandService.game(command, options);
         break;
 
       case 'round':
-        wordWolfCommandService.round(command, fullCommand);
+        wordWolfCommandService.round(command, options);
         break;
 
       case 'set':
-        wordWolfCommandService.set(command, fullCommand);
+        wordWolfCommandService.set(command, options);
         break;
 
       case 'player':
-        wordWolfCommandService.player(command, fullCommand);
+        wordWolfCommandService.player(command, options);
         break;
 
       case 'vote':
-        wordWolfCommandService.word(command, fullCommand);
+        wordWolfCommandService.word(command, options);
         break;
 
       case 'word':
-        wordWolfCommandService.word(command, fullCommand);
+        wordWolfCommandService.word(command, options);
         break;
 
       case 'score':
-        wordWolfCommandService.score(command, fullCommand);
+        wordWolfCommandService.score(command, options);
         break;
 
       case 'library':
-        wordWolfCommandService.library(command, fullCommand);
+        wordWolfCommandService.library(command, options);
         break;
     }
 
