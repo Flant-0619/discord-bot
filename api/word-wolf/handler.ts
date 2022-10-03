@@ -32,11 +32,10 @@ export default async function handler(event:  VercelRequest, response: VercelRes
     }
 
     if (event.body.data.name == 'foo') {
-      response.send(
-        JSON.stringify({
-          "type": 4,  // This type stands for answer with invocation shown
-          "data": { "content": "bar" }
-        })
+      response.send({
+        type: 4,  // This type stands for answer with invocation shown
+        data: { "content": "bar" }
+        }
       )
       response.end()
     }
