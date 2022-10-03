@@ -58,7 +58,6 @@ async function checkRequest(event: VercelRequest): Promise<Boolean> {
   const PUBLIC_KEY = process.env.PUBLIC_KEY
 
   if(!(typeof strBody === 'string')) {
-    console.log(typeof strBody)
     return false
   }
 
@@ -92,7 +91,18 @@ async function buffer(readable: Readable) {
 }
 
 function registerCommands() {
+
+if(!process.env.APPLICATION_ID) {
+  return
+}
+
+if(!process.env.GUILD_ID) {
+  return
+}
+
   const url = `https://discord.com/api/v8/applications/${process.env.APPLICATION_ID}/guilds/${process.env.GUILD_ID}/commands`
+
+  console.log(url)
 
   const headers = {
     "Authorization": `Bot ${process.env.BOT_TOKEN}`,
