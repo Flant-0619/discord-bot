@@ -29,13 +29,15 @@ export default async function handler(event:  VercelRequest, response: VercelRes
 
     if(event.body.type == 1) {
       console.log(200)
-      await registerCommands()
+      // await registerCommands()
       response.statusCode = 200
       response.send({
         type: InteractionResponseType.Pong,
       });
       response.end();
     }
+
+    console.log(event.body.data.name)
 
     if (event.body.data.name == 'foo') {
       response.send({
