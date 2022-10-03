@@ -246,5 +246,5 @@ async function registerCommands() {
     )
   })
 
-  Promise.all(work)
+  await Promise.all(work)
 }
