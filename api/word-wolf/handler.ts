@@ -28,6 +28,7 @@ export default function handler(event:  VercelRequest, response: VercelResponse)
 }
 
 function checkRequest(event: VercelRequest): Boolean {
+  console.log(event.body)
   const headers = event.headers
   const strBody =  String(event.body)
   
