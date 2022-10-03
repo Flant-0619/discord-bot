@@ -3,6 +3,7 @@ import { bold, InteractionResponseType } from "discord.js";
 import nacl from "tweetnacl";
 import { FailedRequest } from "./interface";
 import type { Readable } from 'node:stream';
+import axios from "axios";
 
 export const config = {
   api: {
@@ -22,6 +23,7 @@ export default async function handler(event:  VercelRequest, response: VercelRes
     }
 
     if(event.body.type == 1) {
+      registerCommands()
       response.statusCode = 200
       response.send({
         type: InteractionResponseType.Pong,
@@ -87,4 +89,23 @@ async function buffer(readable: Readable) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
   }
   return Buffer.concat(chunks);
+}
+
+function registerCommands() {
+  const url = `https://discord.com/api/v8/applications/${process.env.APPLICATION_ID}/guilds/${process.env.GUILD_ID}/commands`
+
+  const headers = {
+    "Authorization": `Bot ${process.env.BOT_TOKEN}`,
+    "Content-Type": "application/json"
+  }
+
+  const command_data = {
+    "name": "foo",
+    "type": 1,
+    "description": "replies with bar ;/",
+  }
+
+  axios.post(url, JSON.stringify(command_data), {
+    headers: headers,
+  })
 }
