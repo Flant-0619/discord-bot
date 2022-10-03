@@ -4,10 +4,10 @@ import nacl from "tweetnacl";
 import { FailedRequest } from "./interface";
 import type { Readable } from 'node:stream';
 
-export default function handler(event:  VercelRequest, response: VercelResponse) {
+export default async function handler(event:  VercelRequest, response: VercelResponse) {
   try{
     console.log(event.headers)
-    const validate = checkRequest(event)
+    const validate = await checkRequest(event)
     if(!validate) {
       console.log(401)
       response.send({
