@@ -23,7 +23,7 @@ export default async function handler(event:  VercelRequest, response: VercelRes
     }
 
     if(event.body.type == 1) {
-      registerCommands()
+      await registerCommands()
       response.statusCode = 200
       response.send({
         type: InteractionResponseType.Pong,
@@ -90,7 +90,7 @@ async function buffer(readable: Readable) {
   return Buffer.concat(chunks);
 }
 
-function registerCommands() {
+async function registerCommands() {
 
 // if(!process.env.APPLICATION_ID) {
 //   return
@@ -115,7 +115,7 @@ function registerCommands() {
     "description": "replies with bar ;/",
   }
 
-  axios.post(url, JSON.stringify(command_data), {
+  await axios.post(url, JSON.stringify(command_data), {
     headers: headers,
   })
 }
