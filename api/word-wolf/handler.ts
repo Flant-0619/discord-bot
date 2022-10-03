@@ -25,6 +25,7 @@ export default async function handler(event:  VercelRequest, response: VercelRes
         body: JSON.stringify('invalid request signature'),
       })
       response.end();
+      return;
     }
 
     if(event.body.type == 1) {
