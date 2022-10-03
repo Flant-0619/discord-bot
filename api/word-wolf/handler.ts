@@ -236,19 +236,23 @@ async function registerCommands() {
     {
       "name": "library:category:remove",
       "type": 1,
-      "description": "library remove category;/",
+      "description": "library remov e category;/",
     },
   ]
 
-  const work: Promise<AxiosStatic>[] = []
+  await axios.post(url, JSON.stringify(commands), {
+        headers: headers,
+        })
 
-  commands.forEach((command) => {
-    work.push(
-      axios.post(url, JSON.stringify(command), {
-      headers: headers,
-      })
-    )
-  })
+  // const work: Promise<AxiosStatic>[] = []
 
-  await Promise.all(work)
+  // commands.forEach((command) => {
+  //   work.push(
+  //     axios.post(url, JSON.stringify(command), {
+  //     headers: headers,
+  //     })
+  //   )
+  // })
+
+  // await Promise.all(work)
 }
