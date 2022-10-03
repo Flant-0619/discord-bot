@@ -30,17 +30,25 @@ export default function handler(event:  VercelRequest, response: VercelResponse)
 function checkRequest(event: VercelRequest): Boolean {
   const headers = event.headers
   const strBody = event.body
-
-  const g = `${strBody}`
   
+  const signature = headers["x-signature-ed25519"]
+  const timestamp = headers["x-signature-timestamp"]
   const PUBLIC_KEY = process.env.PUBLIC_KEY
 
-  const signature = headers["x-signature-ed25519"].toString()
-  const timestamp = headers["x-signature-timestamp"]
+  if(!(typeof signature === 'string')) {
+    return false
+  }
 
+  if(!(typeof timestamp === 'string')) {
+    return false
+  }
+  
+  if(PUBLIC_KEY === undefined) {
+    return false
+  }
 
   const isVerified = nacl.sign.detached.verify(
-    Buffer.from(timestamp + g),
+    Buffer.from(timestamp, strBody),
     Buffer.from(signature, 'hex'),
     Buffer.from(PUBLIC_KEY, 'hex')
   );
