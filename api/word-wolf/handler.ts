@@ -66,6 +66,8 @@ async function checkRequest(event: VercelRequest): Promise<Boolean> {
     return false
   }
 
+  console.log("------------------------------------------------------")
+
   const isVerified = nacl.sign.detached.verify(
     Buffer.from(timestamp, strBody),
     Buffer.from(signature, 'hex'),
