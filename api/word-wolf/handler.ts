@@ -35,6 +35,11 @@ function checkRequest(event: VercelRequest): Boolean {
   const timestamp = headers["x-signature-timestamp"]
   const PUBLIC_KEY = process.env.PUBLIC_KEY
 
+  if(!(typeof strBody === 'string')) {
+    console.log(typeof strBody)
+    return false
+  }
+
   if(!(typeof signature === 'string')) {
     return false
   }
