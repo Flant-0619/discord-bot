@@ -16,8 +16,10 @@ const wordWolfCommandService = new WordWolfCommandService()
 
 export default async function handler(event:  VercelRequest, response: VercelResponse) {
   try{
+    console.log(event)
     const validate = await checkRequest(event)
     if(!validate) {
+      console.log(401)
       response.send({
         statusCode: 401,
         body: JSON.stringify('invalid request signature'),
@@ -26,6 +28,7 @@ export default async function handler(event:  VercelRequest, response: VercelRes
     }
 
     if(event.body.type == 1) {
+      console.log(200)
       await registerCommands()
       response.statusCode = 200
       response.send({
