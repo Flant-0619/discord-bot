@@ -2,6 +2,7 @@ import {  VercelRequest, VercelResponse } from "@vercel/node";
 import { InteractionResponseType } from "discord.js";
 import nacl from "tweetnacl";
 import { FailedRequest } from "./interface";
+import type { Readable } from 'node:stream';
 
 export default function handler(event:  VercelRequest, response: VercelResponse) {
   try{
@@ -27,10 +28,12 @@ export default function handler(event:  VercelRequest, response: VercelResponse)
   }
 }
 
-function checkRequest(event: VercelRequest): Boolean {
+async function checkRequest(event: VercelRequest): Promise<Boolean> {
   console.log(event.body)
   const headers = event.headers
-  const strBody =  String(event.body)
+
+  const buf = await buffer(event);
+  const strBody = buf.toString('utf8');
   
   const signature = headers["x-signature-ed25519"]
   const timestamp = headers["x-signature-timestamp"]
@@ -62,4 +65,12 @@ function checkRequest(event: VercelRequest): Boolean {
     console.log(isVerified)
 
   return isVerified
+}
+
+async function buffer(readable: Readable) {
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
 }
