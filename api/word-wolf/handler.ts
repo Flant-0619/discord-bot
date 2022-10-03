@@ -31,6 +31,7 @@ export default async function handler(event:  VercelRequest, response: VercelRes
   }
   } catch(e) {
     console.error(e)
+    response.end();
   }
 }
 
@@ -41,6 +42,8 @@ async function checkRequest(event: VercelRequest): Promise<Boolean> {
   const buf = await buffer(event);
   const json = buf.toString('utf8');
   const strBody = JSON.stringify(json)
+
+  console.log(strBody)
   
   const signature = headers["x-signature-ed25519"]
   const timestamp = headers["x-signature-timestamp"]
