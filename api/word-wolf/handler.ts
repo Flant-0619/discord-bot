@@ -40,8 +40,7 @@ async function checkRequest(event: VercelRequest): Promise<Boolean> {
   const headers = event.headers
 
   const buf = await buffer(event);
-  const json = buf.toString('utf8');
-  const strBody = JSON.stringify(json)
+  const strBody = buf.toString('utf8');
 
   console.log(strBody)
   
@@ -69,7 +68,7 @@ async function checkRequest(event: VercelRequest): Promise<Boolean> {
   console.log("------------------------------------------------------")
 
   const isVerified = nacl.sign.detached.verify(
-    Buffer.from(timestamp, strBody),
+    Buffer.from(timestamp + strBody),
     Buffer.from(signature, 'hex'),
     Buffer.from(PUBLIC_KEY, 'hex')
   );
