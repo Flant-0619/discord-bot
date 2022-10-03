@@ -41,7 +41,9 @@ export default async function handler(event:  VercelRequest, response: VercelRes
     console.log(event.body.data.options)
 
     const command = event.body.data.name
-    const options = event.body.data.options
+    const options = event.body.data.options.map((option) => {
+      return option.name
+    })
 
     switch(event.body.data.name) {
       case 'game':
