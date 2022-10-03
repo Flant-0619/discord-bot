@@ -39,8 +39,8 @@ async function checkRequest(event: VercelRequest): Promise<Boolean> {
   const headers = event.headers
 
   const buf = await buffer(event);
-  const strBody = buf.toString('utf8');
-  console.log(strBody)
+  const json = buf.toString('utf8');
+  const strBody = JSON.stringify(json)
   
   const signature = headers["x-signature-ed25519"]
   const timestamp = headers["x-signature-timestamp"]
