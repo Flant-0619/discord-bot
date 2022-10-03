@@ -1,5 +1,5 @@
 import {  VercelRequest, VercelResponse } from "@vercel/node";
-import { InteractionResponseType } from "discord.js";
+import { bold, InteractionResponseType } from "discord.js";
 import nacl from "tweetnacl";
 import { FailedRequest } from "./interface";
 import type { Readable } from 'node:stream';
@@ -12,23 +12,33 @@ export const config = {
 
 export default async function handler(event:  VercelRequest, response: VercelResponse) {
   try{
-    console.log(event.headers)
     const validate = await checkRequest(event)
     if(!validate) {
-      console.log(401)
       response.send({
         statusCode: 401,
         body: JSON.stringify('invalid request signature'),
       })
       response.end();
-    } else {
-    console.log(200)
-    response.statusCode = 200
-    response.send({
-      type: InteractionResponseType.Pong,
-    });
-    response.end();
-  }
+    }
+
+    if(event.body.type == 1) {
+      response.statusCode = 200
+      response.send({
+        type: InteractionResponseType.Pong,
+      });
+      response.end();
+    }
+
+    if (event.body.data.name == 'foo') {
+      response.send(
+        JSON.stringify({
+          "type": 4,  // This type stands for answer with invocation shown
+          "data": { "content": "bar" }
+        })
+      )
+      response.end()
+    }
+
   } catch(e) {
     console.error(e)
     response.end();
@@ -36,13 +46,10 @@ export default async function handler(event:  VercelRequest, response: VercelRes
 }
 
 async function checkRequest(event: VercelRequest): Promise<Boolean> {
-  console.log(event.body)
   const headers = event.headers
 
   const buf = await buffer(event);
   const strBody = buf.toString('utf8');
-
-  console.log(strBody)
   
   const signature = headers["x-signature-ed25519"]
   const timestamp = headers["x-signature-timestamp"]
@@ -65,15 +72,11 @@ async function checkRequest(event: VercelRequest): Promise<Boolean> {
     return false
   }
 
-  console.log("------------------------------------------------------")
-
   const isVerified = nacl.sign.detached.verify(
     Buffer.from(timestamp + strBody),
     Buffer.from(signature, 'hex'),
     Buffer.from(PUBLIC_KEY, 'hex')
   );
-
-    console.log(isVerified)
 
   return isVerified
 }
