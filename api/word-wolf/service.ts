@@ -1,13 +1,41 @@
+import { StageInstance } from "discord.js";
+import { state } from "./const";
+import { Option, GameInfo, State } from "./interface";
+
+const fs = require("fs")
+const gameInfoJson: GameInfo = fs.readFileSync('game-info.json', 'utf8');
+const stateJson: State = fs.readFileSync('state.json', 'utf8')
+
 export class WordWolfCommandService {
-  game(_command: string, options: string[]) {
+    game(_command: string, options: Option[]) {
     const option = options[0];
-    switch (option) {
+    switch (option.name) {
       case "start":
+        if(stateJson.state != state.waiting) {
+          return
+        }
+        gameInfoJson.round = 0
+        gameInfoJson.players = stateJson.players.map((player) => {
+          return {
+            name : player,
+            point: 0,
+            voted: 0
+          }
+        })
+
+        this.writeGameInfoJson(JSON.stringify(gameInfoJson))
+        this.stateUpdate(state.gameStarted);
         console.log(option);
         break;
 
       case "end":
-        console.log(option);
+        if(stateJson.state == state.awaitSetting ||
+          stateJson.state == state.recruitingPlayer ||
+          stateJson.state == state.waiting) {
+            return
+          }
+        this.writeGameInfoJson("");
+        this.stateUpdate(state.waiting)
         break;
 
       case "help":
@@ -19,10 +47,15 @@ export class WordWolfCommandService {
     }
   }
 
-  round(_command: string, options: string[]) {
+  round(_command: string, options: Option[]) {
     const option = options[0];
-    switch (option) {
+    switch (option.name) {
       case "start":
+        if(stateJson.state != state.wordSetting) {
+            return
+          }
+          gameInfoJson.round += 1
+          this.writeGameInfoJson(JSON.stringify(stateJson))
         console.log(option);
         break;
 
@@ -35,62 +68,86 @@ export class WordWolfCommandService {
     }
   }
 
-  set(_command: string, options: string[]) {
-    const option = options.shift();
-    switch (option) {
-      case "timer":
-        const timer = options.shift();
-        if(Number(timer) <= 5 && Number(timer) > 0) {
-          console.log("timer");
-        } else {
+  set(_command: string, options: Option[]) {
+    if(stateJson.state == state.wordSetting ||
+      stateJson.state == state.waiting ||
+      stateJson.state == state.recruitingPlayer ||
+      stateJson.state == undefined) {
+        return
+      }
+    options.forEach((option) => {
+      const stateJson = fs.readFileSync('setting.json', 'utf8')
+      switch (option.name) {
+        case "timer":
+          const timer = option.value;
+          stateJson.timer = timer;
+          this.writeStateJson(JSON.stringify(stateJson));
+          break;
+  
+        case "round":
+          const round = option.value;
+          stateJson.round = round;
+          this.writeStateJson(JSON.stringify(stateJson));
+          break;
+  
+        case "mode":
+          switch (option.value) {
+            case "auto":
+              const auto = option.value;
+              stateJson.mode = auto;
+              this.writeStateJson(JSON.stringify(stateJson));
+              break;
+
+            case "manual":
+              const manual = option.value;
+              stateJson.mode = manual;
+              this.writeStateJson(JSON.stringify(stateJson));
+              break;
+
+            default:
+              console.log("error");
+          }
+          break;
+  
+        case "help":
+          console.log(option);
+          break;
+  
+        default:
           console.log("error");
-        }
-        break;
-
-      case "round":
-        const round = options.shift();
-        if(Number(round) && Number(round) != undefined) {
-          console.log("round");
-        } else {
-          console.log("error");
-        }
-        break;
-
-      case "mode":
-        const mode = options.shift();
-        if(mode == "auto") {
-          console.log("mode set auto");
-        } else if(mode == "manual") {
-          console.log("mode set manual");
-        } else {
-          console.log("error");
-        }
-        break;
-
-      case "help":
-        console.log(option);
-        break;
-
-      default:
-        console.log("error");
-    }
+      }
+    })
   }
 
 
 
-  player(_command: string, options: string[]) {
-    const option = options.shift();
-    switch (option) {
+  player(_command: string, options: Option[]) {
+    if(!(stateJson.state == state.recruitingPlayer ||
+       stateJson.state == state.roundEnded ||
+        stateJson.state == state.waiting)) {
+          throw new Error()
+    }
+    const option = options[0]
+    switch (option.name) {
       case "add":
-        options.forEach((player) => {
-          console.log(player);
-        })
+        stateJson.players.push(option.value)
+        if(stateJson.players.length >= 3) {
+          stateJson.state = state.waiting
+        }
+        this.writeStateJson(JSON.stringify(stateJson));
+        
         break;
 
       case "remove":
-        options.forEach((player) => {
-          console.log(player);
+        stateJson.players.map((player) => {
+          if(player != option.value) {
+            return player;
+          }
         })
+        if(stateJson.players.length <= 2) {
+          stateJson.state = state.recruitingPlayer
+        }
+        this.writeStateJson(JSON.stringify(stateJson));
         break;
 
       case "help":
@@ -102,30 +159,67 @@ export class WordWolfCommandService {
     }
   }
 
-  vote(_command: string, options: string[]) {
+  vote(_command: string, options: Option[]) {
     const option = options[0];
-    if(option == "help") {
+
+    if(!(stateJson.state == state.roundStarted ||
+      stateJson.state == state.voting)) {
+      return
+    }
+
+    if(option == undefined) {
+      this.stateUpdate(state.voting);
+      return
+    }
+
+    if(option.name == "player") {
+      gameInfoJson.players = gameInfoJson.players.map((player) => {
+        if(player.name == option.value) {
+          player.voted += 1;
+        }
+        return player;
+      })
+      
+      this.writeGameInfoJson(JSON.stringify(gameInfoJson));
+    }
+
+    if(option.name == "help") {
       console.log(option);
     } else {
       console.log(option);
     }
   }
 
-  word(_command: string, options: string[]) {
-    const option = options.shift();
-    switch (option) {
+  word(_command: string, options: Option[]) {
+    const option = options[0]
+    switch (option.value) {
       case "answer":
-        const answer = options[0];
+        const answer = option.value;
         console.log(answer);
         break;
 
       case "human":
-        const human = options[0];
-        console.log(human);
+        if(!(stateJson.state == state.gameStarted ||
+          stateJson.state == state.roundEnded)) {
+            return
+          }
+        const human = option.value;
+        gameInfoJson.word.human = human
+        if(gameInfoJson.word.wolf != undefined) {
+          this.stateUpdate(state.wordSetting);
+        }
         break;
 
       case "wolf":
-        const wolf = options[0];
+        if(!(stateJson.state == state.gameStarted ||
+          stateJson.state == state.roundEnded)) {
+            return
+          }
+        const wolf = option.value;
+        gameInfoJson.word.wolf = wolf;
+        if(gameInfoJson.word.human != undefined) {
+          this.stateUpdate(state.wordSetting);
+        }
         console.log(wolf);
         break;
 
@@ -138,58 +232,42 @@ export class WordWolfCommandService {
     }
   }
 
-  score(_command: string, options: string[]) {
+  score(_command: string, options: Option[]) {
     const option = options[0];
-    if(option == "help") {
+    if(stateJson.state == state.waiting ||
+      stateJson.state == state.awaitSetting ||
+      stateJson.state == state.recruitingPlayer) {
+        return;
+      }
+    if(option.name == "help") {
       console.log(option);
     } else {
       console.log(option);
     }
   }
 
-  library(_command: string, options: string[]) {
-    const option = options.shift();
-    switch (option) {
-      case "word":
-        const wordAttribute = options.shift();
-        switch (wordAttribute) {
-          case "add":
-            const addHuman = options[0];
-            const addWolf = option[1];
-            console.log(addHuman);
-            console.log(addWolf);
-            break;
-
-          case "remove":
-            const removeHuman = options[0];
-            const removeWolf = option[1];
-            console.log(removeHuman);
-            console.log(removeWolf);
-            break;
-        }
-        break;
-
-      case "category":
-        const categoryAttribute = options.shift();
-        switch (categoryAttribute) {
-          case "add":
-            const addCategory = options[0];
-            console.log(addCategory);
-            break;
-
-          case "remove":
-            const removeCategory = options[0];
-            console.log(removeCategory);
-            break;
-        }
-        break;
-
-      case "help":
-        console.log(option);
-        break;
-
-      default:
-        console.log("error");
+  private writeStateJson(jsonString: string) {
+    const filePath = "state.json";
+    fs.writeFileSync(filePath, jsonString);
+    const stateJson: State = fs.readFileSync(filePath, 'utf8');
+    if(stateJson.mode != undefined &&
+      stateJson.round != undefined &&
+      stateJson.timer != undefined && 
+      stateJson.state == state.awaitSetting) {
+        this.stateUpdate(state.recruitingPlayer)
     }
   }
+
+  private writeGameInfoJson(jsonString: string) {
+    const filePath = "state.json";
+    fs.writeFileSync(filePath, jsonString);
+  }
+
+  private stateUpdate(state: string) {
+    const filePath = "state.json";
+    const stateJson: State = fs.readFileSync(filePath, 'utf8');
+    stateJson.state = state
+    fs.writeFileSync(filePath, stateJson)
+  }
+
 }
