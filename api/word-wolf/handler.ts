@@ -54,7 +54,7 @@ export default async function handler(event:  VercelRequest, response: VercelRes
         break;
 
       case 'round':
-        const url = "https://discord.com/api/v8/applications/users/@me/channels"
+        const url = "https://discord.com/users/@me/channels"
         // wordWolfCommandService.round(command, options);
         console.log
         const headers = {
