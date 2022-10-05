@@ -12,7 +12,7 @@ export const config = {
   },
 };
 
-const wordWolfCommandService = new WordWolfCommandService()
+// const wordWolfCommandService = new WordWolfCommandService()
 
 export default async function handler(event:  VercelRequest, response: VercelResponse) {
   try{
@@ -44,19 +44,19 @@ export default async function handler(event:  VercelRequest, response: VercelRes
 
     switch(command) {
       case 'game':
-        wordWolfCommandService.game(command, options);
-        response.send({
-          type: 4,  // This type stands for answer with invocation shown
-          data: { "content": "bar" }
-          }
-        )
+        // wordWolfCommandService.game(command, options);
+        // response.send({
+        //   type: 4,  // This type stands for answer with invocation shown
+        //   data: { "content": "bar" }
+        //   }
+        // )
         
         break;
 
       case 'round':
         const url = "https://discord.com/api/v8/applications/users/@me/channels"
         // wordWolfCommandService.round(command, options);
-        console.log(url)
+        console.log
         const headers = {
           "Authorization": `Bot ${process.env.BOT_TOKEN}`,
           "Content-Type": "application/json"
@@ -79,23 +79,23 @@ export default async function handler(event:  VercelRequest, response: VercelRes
         break;
 
       case 'set':
-        wordWolfCommandService.set(command, options);
+        // wordWolfCommandService.set(command, options);
         break;
 
       case 'player':
-        wordWolfCommandService.player(command, options);
+        // wordWolfCommandService.player(command, options);
         break;
 
       case 'vote':
-        wordWolfCommandService.word(command, options);
+        // wordWolfCommandService.word(command, options);
         break;
 
       case 'word':
-        wordWolfCommandService.word(command, options);
+        // wordWolfCommandService.word(command, options);
         break;
 
       case 'score':
-        wordWolfCommandService.score(command, options);
+        // wordWolfCommandService.score(command, options);
         break;
     }
 
