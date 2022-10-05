@@ -3,8 +3,8 @@ import { state } from "./const";
 import { Option, GameInfo, State } from "./interface";
 
 const fs = require("fs")
-const gameInfoJson: GameInfo = fs.readFileSync('game-info.json', 'utf8');
-const stateJson: State = fs.readFileSync('state.json', 'utf8')
+const gameInfoJson: GameInfo = fs.readFileSync('../../game-info.json', 'utf8');
+const stateJson: State = fs.readFileSync('../../state.json', 'utf8')
 
 export class WordWolfCommandService {
     game(_command: string, options: Option[]) {
