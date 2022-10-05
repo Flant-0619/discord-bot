@@ -56,6 +56,7 @@ export default async function handler(event:  VercelRequest, response: VercelRes
       case 'round':
         const url = "https://discord.com/api/v8/applications/users/@me/channels"
         // wordWolfCommandService.round(command, options);
+        console.log(url)
         const headers = {
           "Authorization": `Bot ${process.env.BOT_TOKEN}`,
           "Content-Type": "application/json"
@@ -72,6 +73,8 @@ export default async function handler(event:  VercelRequest, response: VercelRes
             data: { "content": "createDM" }
             }
           )
+          response.end()
+          return
 
         break;
 
